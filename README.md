@@ -63,3 +63,5 @@ codesign --force --deep --sign - /Applications/Klipi.app
 - Press `Alt+Cmd+.` to open the clipboard history popup
 - Use arrow keys to navigate, Enter to copy
 - Or click on an item to copy it
+
+#
