@@ -65,3 +65,5 @@ codesign --force --deep --sign - /Applications/Klipi.app
 - Or click on an item to copy it
 
 #
+
+#
