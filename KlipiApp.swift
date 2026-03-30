@@ -2,12 +2,10 @@ import SwiftUI
 import AppKit
 import Carbon
 
-// Shared ViewModel instance
 class SharedViewModel {
     static let shared = ClipboardViewModel()
 }
 
-// Observable object to track permission state
 class PermissionManager: ObservableObject {
     static let shared = PermissionManager()
     @Published var hasPermission = false
@@ -41,12 +39,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let event = NSApp.currentEvent
 
         if event?.type == .rightMouseUp {
-            // Show menu on right-click
             let menu = NSMenu()
             menu.addItem(NSMenuItem(title: "Quit Klipi", action: #selector(quitApp), keyEquivalent: "q"))
             statusItem?.popUpMenu(menu)
         } else {
-            // Toggle popover on left-click
             togglePopover()
         }
     }
@@ -57,12 +53,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @discardableResult
     func setupKeyboardShortcut() -> Bool {
-        // If already set up, return true
         if eventTap != nil {
             return true
         }
 
-        // Use CGEventTap for more reliable global hotkey capture
         let eventMask = (1 << CGEventType.keyDown.rawValue)
 
         guard let tap = CGEvent.tapCreate(
@@ -73,13 +67,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             callback: { proxy, type, event, refcon in
                 let appDelegate = Unmanaged<AppDelegate>.fromOpaque(refcon!).takeUnretainedValue()
 
-                // Check for Alt+Cmd+. (period keyCode 47)
                 let flags = event.flags
                 let isCmd = flags.contains(.maskCommand)
                 let isAlt = flags.contains(.maskAlternate)
+                let isCtrl = flags.contains(.maskControl)
+                let isShift = flags.contains(.maskShift)
                 let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
 
-                if isCmd && isAlt && keyCode == 47 {
+                // Get current shortcut from settings
+                let shortcut = SettingsManager.shared.shortcut
+                let modifiersMatch = (shortcut.modifiers.command == isCmd &&
+                                       shortcut.modifiers.option == isAlt &&
+                                       shortcut.modifiers.control == isCtrl &&
+                                       shortcut.modifiers.shift == isShift)
+
+                if modifiersMatch && keyCode == shortcut.keyCode {
                     DispatchQueue.main.async {
                         appDelegate.togglePopover()
                     }
@@ -114,7 +116,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if isPopoverShown {
             closePopover()
         } else {
-            // Activate the app first
             NSApplication.shared.activate(ignoringOtherApps: true)
 
             if popover == nil {
@@ -123,7 +124,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 popover?.contentSize = NSSize(width: 320, height: 400)
             }
 
-            // Create hosting view with proper sizing
             let hostingView = NSHostingView(rootView: MenuBarView(
                 viewModel: viewModel,
                 onRetryPermission: { [weak self] in
@@ -147,7 +147,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func closePopover() {
         popover?.performClose(nil)
         isPopoverShown = false
-        // Hide the app to return focus to previous window
         NSApplication.shared.hide(nil)
     }
 }
@@ -157,16 +156,13 @@ struct KlipiApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     init() {
-        // Hide dock icon - this is a menu bar app
         NSApplication.shared.setActivationPolicy(.accessory)
     }
 
     var body: some Scene {
-        // Empty scene - UI is handled by AppDelegate's NSStatusItem
         Settings {
             EmptyView()
                 .onAppear {
-                    // Close any windows that might appear
                     DispatchQueue.main.async {
                         NSApplication.shared.windows.forEach { window in
                             if window.contentView?.subviews.first is NSHostingView<EmptyView> {
@@ -179,7 +175,6 @@ struct KlipiApp: App {
     }
 }
 
-// SwiftUI requires at least one Scene
 struct EmptyView: View {
     var body: some View {
         Text("")

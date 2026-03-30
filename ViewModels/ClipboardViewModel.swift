@@ -5,6 +5,8 @@ class ClipboardViewModel: ObservableObject {
     @Published var history: [ClipboardItem] = []
     @Published var searchText: String = ""
 
+    let settingsManager = SettingsManager.shared
+
     private let maxItems = 50
     private let storageKey = "clipboardHistory"
 

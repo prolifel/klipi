@@ -9,6 +9,7 @@ struct MenuBarView: View {
     @State private var selectedIndex: Int?
     @State private var showCopiedOverlay = false
     @State private var showOnboarding: Bool?
+    @State private var showSettings = false
     @State private var keyboardMonitor: Any?
 
     var body: some View {
@@ -25,6 +26,12 @@ struct MenuBarView: View {
                         Text("Clipboard History")
                             .font(.headline)
                         Spacer()
+                        Button(action: { showSettings = true }) {
+                            Image(systemName: "gear")
+                                .font(.system(size: 12))
+                        }
+                        .buttonStyle(.plain)
+                        .help("Settings")
                         Button(action: { viewModel.clearHistory() }) {
                             Image(systemName: "trash")
                                 .font(.system(size: 12))
@@ -145,6 +152,12 @@ struct MenuBarView: View {
                 NSEvent.removeMonitor(monitor)
                 keyboardMonitor = nil
             }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView(shortcut: Binding(
+                get: { viewModel.settingsManager.shortcut },
+                set: { viewModel.settingsManager.shortcut = $0 }
+            ))
         }
     }
 
