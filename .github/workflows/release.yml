@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.0'
+          xcode-version: "16.0"
 
       - name: Build app
         run: |
@@ -37,10 +37,14 @@ jobs:
             -ov -format UDZO \
             Klipi-${{ github.ref_name }}.dmg
 
-      - name: Generate checksum
+      - name: Generate checksum dmg
         run: |
           shasum -a 256 Klipi-${{ github.ref_name }}.dmg > checksum.txt
           cat checksum.txt
+
+      - name: Generate checksum tarball
+        run: |
+          curl -sL "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz" | shasum -a 256 | cut -d " " -f 1 > checksum-tarball.txt
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
