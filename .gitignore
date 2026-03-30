@@ -88,4 +88,5 @@ iOSInjectionProject/
 # End of https://www.toptal.com/developers/gitignore/api/swift
 
 .claude
-.DS_StoreKlipi-*.dmg
+.DS_Store
+Klipi-*.dmg
