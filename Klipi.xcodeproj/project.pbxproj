@@ -14,6 +14,10 @@
 		AAA1005 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA2005 /* MenuBarView.swift */; };
 		AAA1006 /* ClipboardRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA2006 /* ClipboardRowView.swift */; };
 		AAA1007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAA2007 /* Assets.xcassets */; };
+		AAA1008 /* KeyboardShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA2008 /* KeyboardShortcut.swift */; };
+		AAA1009 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA2009 /* SettingsManager.swift */; };
+		AAA1010 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA2010 /* SettingsView.swift */; };
+		AAA1011 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA2011 /* OnboardingView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,7 +28,11 @@
 		AAA2005 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		AAA2006 /* ClipboardRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardRowView.swift; sourceTree = "<group>"; };
 		AAA2007 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AAA2008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AAA2008 /* KeyboardShortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcut.swift; sourceTree = "<group>"; };
+		AAA2009 /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
+		AAA2010 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AAA2011 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		AAA2012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAA3001 /* Klipi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Klipi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -56,7 +64,7 @@
 				AAA5007 /* Views */,
 				AAA5005 /* Services */,
 				AAA2007 /* Assets.xcassets */,
-				AAA2008 /* Info.plist */,
+				AAA2012 /* Info.plist */,
 			);
 			path = .;
 			sourceTree = "<group>";
@@ -65,6 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				AAA2002 /* ClipboardItem.swift */,
+				AAA2008 /* KeyboardShortcut.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -81,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				AAA2003 /* ClipboardViewModel.swift */,
+				AAA2009 /* SettingsManager.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -90,6 +100,8 @@
 			children = (
 				AAA2005 /* MenuBarView.swift */,
 				AAA2006 /* ClipboardRowView.swift */,
+				AAA2010 /* SettingsView.swift */,
+				AAA2011 /* OnboardingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -172,6 +184,10 @@
 				AAA1004 /* ClipboardMonitor.swift in Sources */,
 				AAA1005 /* MenuBarView.swift in Sources */,
 				AAA1006 /* ClipboardRowView.swift in Sources */,
+				AAA1008 /* KeyboardShortcut.swift in Sources */,
+				AAA1009 /* SettingsManager.swift in Sources */,
+				AAA1010 /* SettingsView.swift in Sources */,
+				AAA1011 /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
