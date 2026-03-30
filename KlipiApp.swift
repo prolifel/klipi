@@ -21,6 +21,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
         PermissionManager.shared.hasPermission = setupKeyboardShortcut()
+
+        // Close popover when app loses focus
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationDidResignActive),
+            name: NSApplication.didResignActiveNotification,
+            object: nil
+        )
+    }
+
+    @objc func applicationDidResignActive(_ notification: Notification) {
+        if isPopoverShown {
+            closePopover()
+        }
     }
 
     var needsOnboarding: Bool {
