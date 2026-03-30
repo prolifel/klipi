@@ -6,77 +6,144 @@ on:
       - "v*"
 
 jobs:
-  build:
-    runs-on: macos-latest
+  # build:
+  #   runs-on: macos-latest
+
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup Xcode
+  #       uses: maxim-lobanov/setup-xcode@v1
+  #       with:
+  #         xcode-version: "16.0"
+
+  #     - name: Build app
+  #       run: |
+  #         xcodebuild -project Klipi.xcodeproj \
+  #           -scheme Klipi \
+  #           -configuration Release \
+  #           -derivedDataPath build \
+  #           CODE_SIGN_IDENTITY="-" \
+  #           CODE_SIGNING_REQUIRED=NO \
+  #           CODE_SIGNING_ALLOWED=NO
+
+  #     - name: Create DMG
+  #       run: |
+  #         mkdir -p dmg-temp
+  #         cp -R build/Build/Products/Release/Klipi.app dmg-temp/
+  #         hdiutil create -volname "Klipi" \
+  #           -srcfolder dmg-temp \
+  #           -ov -format UDZO \
+  #           Klipi-${{ github.ref_name }}.dmg
+
+  #     - name: Generate checksum dmg
+  #       run: |
+  #         shasum -a 256 Klipi-${{ github.ref_name }}.dmg > checksum.txt
+  #         cat checksum.txt
+
+  #     - name: Generate checksum tarball
+  #       run: |
+  #         curl -sL "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz" | shasum -a 256 | cut -d " " -f 1 > checksum-tarball.txt
+  #         cat checksum-tarball.txt
+
+  #     - name: Create GitHub Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: |
+  #           Klipi-${{ github.ref_name }}.dmg
+  #           checksum.txt
+  #           checksum-tarball.txt
+  #         body: |
+  #           ## Klipi ${{ github.ref_name }}
+
+  #           ### Download
+  #           - `Klipi-${{ github.ref_name }}.dmg`
+
+  #           ### Installation
+  #           ```bash
+  #           # Download and install
+  #           brew install --cask ./Klipi-${{ github.ref_name }}.dmg
+  #           ```
+
+  #           ### Checksum
+  #           See `checksum.txt` for SHA256 verification.
+  #           See `checksum-tarball.txt` for SHA256 tarball verification.
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Upload build artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: Klipi-${{ github.ref_name }}
+  #         path: |
+  #           Klipi-${{ github.ref_name }}.dmg
+  #           checksum.txt
+  #           checksum-tarball.txt
+
+  bump:
+    runs-on: ubuntu-latest
+    env:
+      TAP_REPO: prolifel/homebrew-tap
+      FORMULA_PATH: Formula/klipi.rb
+      OWNER_REPO: prolifel/klipi
+
+    concurrency:
+      group: formula-update
+      cancel-in-progress: false
 
     steps:
-      - name: Checkout repository
+      - name: Derive version + tarball URL from tag
+        id: meta
+        run: |
+          echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          echo "tar_url=https://github.com/${OWNER_REPO}/archive/refs/tags/${GITHUB_REF_NAME}.tar.gz" >> "$GITHUB_OUTPUT"
+
+      - name: Compute sha256
+        id: sha
+        run: |
+          set -euo pipefail
+          SHA256="$(
+            curl --fail --location --silent --show-error "${{ steps.meta.outputs.tar_url }}" \
+            | sha256sum | cut -d' ' -f1
+          )"
+          echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout tap (write-enabled)
         uses: actions/checkout@v4
-
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "16.0"
+          repository: ${{ env.TAP_REPO }}
+          ref: main
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          persist-credentials: false
 
-      - name: Build app
+      - name: Update formula url/sha256
         run: |
-          xcodebuild -project Klipi.xcodeproj \
-            -scheme Klipi \
-            -configuration Release \
-            -derivedDataPath build \
-            CODE_SIGN_IDENTITY="-" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+          set -euo pipefail
+          export TAR_URL="${{ steps.meta.outputs.tar_url }}"
+          export SHA256="${{ steps.sha.outputs.sha256 }}"
+          : "${TAR_URL:?missing TAR_URL from meta}"
+          : "${SHA256:?missing SHA256 from sha}"
+          perl -0777 -pe '
+            s{^(\s*url\s*")[^\"]*(")}{$1 . $ENV{TAR_URL} . $2}me;
+            s{^(\s*sha256\s*")[^\"]*(")}{$1 . $ENV{SHA256} . $2}me;
+          ' -i "${FORMULA_PATH}"
+          grep -En '^\s*(url|sha256)\s*"' "${FORMULA_PATH}"
 
-      - name: Create DMG
-        run: |
-          mkdir -p dmg-temp
-          cp -R build/Build/Products/Release/Klipi.app dmg-temp/
-          hdiutil create -volname "Klipi" \
-            -srcfolder dmg-temp \
-            -ov -format UDZO \
-            Klipi-${{ github.ref_name }}.dmg
-
-      - name: Generate checksum dmg
-        run: |
-          shasum -a 256 Klipi-${{ github.ref_name }}.dmg > checksum.txt
-          cat checksum.txt
-
-      - name: Generate checksum tarball
-        run: |
-          curl -sL "${{ github.server_url }}/${{ github.repository }}/archive/refs/tags/${{ github.ref_name }}.tar.gz" | shasum -a 256 | cut -d " " -f 1 > checksum-tarball.txt
-          cat checksum-tarball.txt
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            Klipi-${{ github.ref_name }}.dmg
-            checksum.txt
-            checksum-tarball.txt
-          body: |
-            ## Klipi ${{ github.ref_name }}
-
-            ### Download
-            - `Klipi-${{ github.ref_name }}.dmg`
-
-            ### Installation
-            ```bash
-            # Download and install
-            brew install --cask ./Klipi-${{ github.ref_name }}.dmg
-            ```
-
-            ### Checksum
-            See `checksum.txt` for SHA256 verification.
-            See `checksum-tarball.txt` for SHA256 tarball verification.
+      - name: Commit & push to main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Klipi-${{ github.ref_name }}
-          path: |
-            Klipi-${{ github.ref_name }}.dmg
-            checksum.txt
-            checksum-tarball.txt
+          GH_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GH_NAME: github-actions[bot]
+        run: |
+          set -euo pipefail
+          git config user.email "$GH_EMAIL"
+          git config user.name "$GH_NAME"
+          if git diff --quiet -- "${FORMULA_PATH}"; then
+            echo "No changes to commit; skipping push."
+            exit 0
+          fi
+          git add "${FORMULA_PATH}"
+          git commit -m "imsg ${{ steps.meta.outputs.version }}: bump formula"
+          git remote set-url origin "https://x-access-token:${{ secrets.HOMEBREW_TAP_TOKEN }}@github.com/${{ env.TAP_REPO }}.git"
+          git pull --rebase origin main
+          git push origin HEAD:main
