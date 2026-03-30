@@ -55,6 +55,7 @@ class ClipboardViewModel: ObservableObject {
     }
 
     func copyItem(_ item: ClipboardItem) {
+        print("[DEBUG] copyItem called with: \(item.content)")
         // Just copy to clipboard, history will be updated by monitor when pasting elsewhere
         monitor?.copyToClipboard(item.content)
     }

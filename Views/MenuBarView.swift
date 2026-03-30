@@ -9,6 +9,7 @@ struct MenuBarView: View {
     @State private var selectedIndex: Int?
     @State private var showCopiedOverlay = false
     @State private var showOnboarding: Bool?
+    @State private var keyboardMonitor: Any?
 
     var body: some View {
         ZStack {
@@ -76,6 +77,7 @@ struct MenuBarView: View {
                                         ClipboardRowView(
                                             item: item,
                                             onCopy: {
+                                                print("[DEBUG] Clicked item: \(item.content), id: \(item.id)")
                                                 viewModel.copyItem(item)
                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                                     onClose()
@@ -138,10 +140,20 @@ struct MenuBarView: View {
             selectedIndex = nil
             setupKeyboardMonitor()
         }
+        .onDisappear {
+            if let monitor = keyboardMonitor {
+                NSEvent.removeMonitor(monitor)
+                keyboardMonitor = nil
+            }
+        }
     }
 
     private func setupKeyboardMonitor() {
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+        // Remove existing monitor if any
+        if let monitor = keyboardMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        keyboardMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             handleKeyPress(event: event)
             return event
         }
@@ -160,6 +172,7 @@ struct MenuBarView: View {
             } else {
                 selectedIndex = 0
             }
+            print("[DEBUG] Down arrow: selectedIndex=\(String(describing: selectedIndex))")
         case 126: // Up arrow
             if items.isEmpty { return }
             if let current = selectedIndex {
@@ -167,8 +180,10 @@ struct MenuBarView: View {
             } else {
                 selectedIndex = 0
             }
+            print("[DEBUG] Up arrow: selectedIndex=\(String(describing: selectedIndex))")
         case 36: // Return
             if let index = selectedIndex, index < items.count {
+                print("[DEBUG] Enter key: selectedIndex=\(index), item=\(items[index].content)")
                 viewModel.copyItem(items[index])
                 // Show copied overlay briefly before closing
                 withAnimation {

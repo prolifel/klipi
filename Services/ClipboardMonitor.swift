@@ -41,6 +41,7 @@ class ClipboardMonitor: ObservableObject {
     }
 
     func copyToClipboard(_ content: String) {
+        print("[DEBUG] copyToClipboard: \(content)")
         isCopyingFromHistory = true
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
