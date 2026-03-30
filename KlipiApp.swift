@@ -55,7 +55,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if event?.type == .rightMouseUp {
             let menu = NSMenu()
             menu.addItem(NSMenuItem(title: "Quit Klipi", action: #selector(quitApp), keyEquivalent: "q"))
-            statusItem?.popUpMenu(menu)
+            statusItem?.menu = menu
+            statusItem?.button?.performClick(nil)
+            statusItem?.menu = nil
         } else {
             togglePopover()
         }
