@@ -1,0 +1,74 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.0'
+
+      - name: Build app
+        run: |
+          xcodebuild -project Klipi.xcodeproj \
+            -scheme Klipi \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Create DMG
+        run: |
+          mkdir -p dmg-temp
+          cp -R build/Build/Products/Release/Klipi.app dmg-temp/
+          hdiutil create -volname "Klipi" \
+            -srcfolder dmg-temp \
+            -ov -format UDZO \
+            Klipi-${{ github.ref_name }}.dmg
+
+      - name: Generate checksum
+        run: |
+          shasum -a 256 Klipi-${{ github.ref_name }}.dmg > checksum.txt
+          cat checksum.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            Klipi-${{ github.ref_name }}.dmg
+            checksum.txt
+          body: |
+            ## Klipi ${{ github.ref_name }}
+
+            ### Download
+            - `Klipi-${{ github.ref_name }}.dmg`
+
+            ### Installation
+            ```bash
+            # Download and install
+            brew install --cask ./Klipi-${{ github.ref_name }}.dmg
+            ```
+
+            ### Checksum
+            See `checksum.txt` for SHA256 verification.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Klipi-${{ github.ref_name }}
+          path: |
+            Klipi-${{ github.ref_name }}.dmg
+            checksum.txt
