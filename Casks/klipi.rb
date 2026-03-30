@@ -1,6 +1,6 @@
 cask "klipi" do
-  version "1.0.0"
-  sha256 "PLACEHOLDER_CHECKSUM"
+  version "1.0.5"
+  sha256 "73b0a82d80c2f72e2abf086c49d3a75c9cbe3c5ef0944d9ffbb1a7a582959efc"
 
   url "https://github.com/prolifel/klipi/releases/download/v#{version}/Klipi-#{version}.dmg"
   name "Klipi"

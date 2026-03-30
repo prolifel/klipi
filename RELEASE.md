@@ -5,6 +5,7 @@ This document explains how to publish Klipi to Homebrew using GitHub Actions for
 ## Overview
 
 The release process:
+
 1. Push a version tag (e.g., `v1.0.0`) to GitHub
 2. GitHub Actions automatically builds the app and creates a DMG
 3. A GitHub Release is created with the DMG file
@@ -36,6 +37,7 @@ git push -u origin main
 ### Step 1: Update Version
 
 Update version numbers in:
+
 - `Info.plist`: `CFBundleShortVersionString` and `CFBundleVersion`
 
 ### Step 2: Commit and Tag
@@ -67,14 +69,14 @@ For proper code signing and notarization, add these secrets to your repository:
 
 Go to Settings → Secrets and variables → Actions
 
-| Secret Name | Description |
-|-------------|-------------|
-| `APPLE_CERTIFICATES_P12` | Base64 encoded .p12 certificate |
-| `APPLE_CERTIFICATES_PASSWORD` | Password for .p12 file |
-| `KEYCHAIN_PASSWORD` | Temporary keychain password |
-| `APPLE_ID` | Your Apple ID email |
-| `APPLE_TEAM_ID` | Your Apple Developer Team ID |
-| `APPLE_APP_PASSWORD` | App-specific password for notarization |
+| Secret Name                   | Description                            |
+| ----------------------------- | -------------------------------------- |
+| `APPLE_CERTIFICATES_P12`      | Base64 encoded .p12 certificate        |
+| `APPLE_CERTIFICATES_PASSWORD` | Password for .p12 file                 |
+| `KEYCHAIN_PASSWORD`           | Temporary keychain password            |
+| `APPLE_ID`                    | Your Apple ID email                    |
+| `APPLE_TEAM_ID`               | Your Apple Developer Team ID           |
+| `APPLE_APP_PASSWORD`          | App-specific password for notarization |
 
 ### Update Workflow for Signing
 
@@ -163,6 +165,7 @@ brew uninstall --cask klipi
 **PR Title format:** `klipi #{version} (new formula)`
 
 **PR Description example:**
+
 ```
 Add Klipi, a clipboard history manager for macOS.
 
@@ -237,12 +240,12 @@ xcodebuild -project Klipi.xcodeproj -scheme Klipi -configuration Release
 
 ## Quick Reference
 
-| Task | Command |
-|------|---------|
-| Create tag | `git tag v1.0.0` |
-| Push tag | `git push origin v1.0.0` |
-| Get checksum | `shasum -a 256 file.dmg` |
-| Test cask locally | `brew install --cask ./klipi.rb` |
+| Task              | Command                                   |
+| ----------------- | ----------------------------------------- |
+| Create tag        | `git tag v1.0.0`                          |
+| Push tag          | `git push origin v1.0.0`                  |
+| Get checksum      | `shasum -a 256 file.dmg`                  |
+| Test cask locally | `brew install --cask ./klipi.rb`          |
 | Bump cask version | `brew bump-cask-pr klipi --version 1.1.0` |
 
 ---
