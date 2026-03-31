@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Klipi - A lightweight macOS clipboard history manager that lives in your menu bar">
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
+  <title>Klipi - Lightweight macOS Clipboard History Manager</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f7;
+      --text: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --accent: #0071e3;
+      --accent-hover: #0077ed;
+      --border: #d2d2d7;
+      --card: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] {
+      --bg: #1c1c1e;
+      --bg-secondary: #2c2c2e;
+      --text: #f5f5f7;
+      --text-secondary: #a1a1a6;
+      --accent: #0a84ff;
+      --accent-hover: #409cff;
+      --border: #3a3a3c;
+      --card: #2c2c2e;
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #1c1c1e;
+        --bg-secondary: #2c2c2e;
+        --text: #f5f5f7;
+        --text-secondary: #a1a1a6;
+        --accent: #0a84ff;
+        --accent-hover: #409cff;
+        --border: #3a3a3c;
+        --card: #2c2c2e;
+        --shadow: rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    /* Theme-aware icons */
+    .icon-dark { display: none; }
+    .icon-light { display: block; }
+
+    [data-theme="dark"] .icon-dark { display: block; }
+    [data-theme="dark"] .icon-light { display: none; }
+    [data-theme="dark"] .icon-dark.img { display: inline; }
+    [data-theme="dark"] .icon-light.img { display: none; }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .icon-dark { display: block; }
+      :root:not([data-theme="light"]) .icon-light { display: none; }
+      :root:not([data-theme="light"]) .icon-dark.img { display: inline; }
+      :root:not([data-theme="light"]) .icon-light.img { display: none; }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon img {
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+      font-size: 0.875rem;
+      transition: background-color 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background: var(--border);
+    }
+
+    .theme-toggle svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 80px 0 60px;
+    }
+
+    .hero-icon {
+      width: 128px;
+      height: 128px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-icon img {
+      width: 128px;
+      height: 128px;
+    }
+
+    .hero h2 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    /* Sections */
+    section {
+      padding: 60px 0;
+    }
+
+    section h3 {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .section-desc {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Features */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .feature-card h4 {
+      font-size: 1.125rem;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+
+    /* Installation */
+    .install-section {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 40px;
+    }
+
+    .install-code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
+      font-size: 0.9375rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      overflow-x: auto;
+      margin-top: 24px;
+    }
+
+    .install-code code {
+      color: var(--text);
+    }
+
+    .copy-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 0.8125rem;
+      white-space: nowrap;
+      transition: background-color 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--border);
+    }
+
+    .copy-btn.copied {
+      background: #34c759;
+      color: white;
+      border-color: #34c759;
+    }
+
+    /* Usage */
+    .usage-steps {
+      display: grid;
+      gap: 24px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .usage-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-number {
+      background: var(--accent);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .step-content h4 {
+      font-size: 1.0625rem;
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+
+    .keyboard-shortcut {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-family: "SF Mono", Monaco, monospace;
+      font-size: 0.875rem;
+    }
+
+    /* Donation */
+    .donation-links {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero h2 {
+        font-size: 2rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      section h3 {
+        font-size: 1.5rem;
+      }
+
+      .install-section {
+        padding: 24px;
+      }
+
+      .install-code {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <a href="#" class="logo">
+          <div class="logo-icon">
+            <img src="icon-light.png" alt="Klipi Logo" class="icon-light img">
+            <img src="icon-dark.png" alt="Klipi Logo" class="icon-dark img">
+          </div>
+          <h1>Klipi</h1>
+        </a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span class="theme-label">Light</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-icon">
+          <img src="icon-light.png" alt="Klipi" class="icon-light img">
+          <img src="icon-dark.png" alt="Klipi" class="icon-dark img">
+        </div>
+        <h2>Clipboard History,<br>Made Simple</h2>
+        <p>A lightweight macOS clipboard history manager that lives in your menu bar. Fast, minimal, and stays out of your way.</p>
+        <div class="hero-buttons">
+          <a href="#install" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Install with Homebrew
+          </a>
+          <a href="https://github.com/prolifel/klipi" class="btn btn-secondary" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <h3>Features</h3>
+        <p class="section-desc">Everything you need in a clipboard manager, nothing you don't.</p>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h4>Lightning Fast</h4>
+            <p>Opens instantly with a keyboard shortcut. No lag, no delays.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h4>50 Item History</h4>
+            <p>Stores your last 50 clipboard items, persisted across app restarts.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h4>Quick Search</h4>
+            <p>Find any clipboard item quickly with built-in search.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">⌨️</div>
+            <h4>Keyboard Navigation</h4>
+            <p>Navigate with arrow keys, copy with Enter. No mouse needed.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h4>Menu Bar Native</h4>
+            <p>Lives in your menu bar, always accessible, never in the way.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔧</div>
+            <h4>Customizable</h4>
+            <p>Set your own keyboard shortcut. Make it yours.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="install">
+      <div class="container">
+        <h3>Installation</h3>
+        <p class="section-desc">Get Klipi running in seconds with Homebrew.</p>
+        <div class="install-section">
+          <p>Install via Homebrew (recommended):</p>
+          <div class="install-code">
+            <code>brew tap prolifel/homebrew-tap && brew install klipi</code>
+            <button class="copy-btn" data-code="brew tap prolifel/homebrew-tap &#38;&#38; brew install klipi">Copy</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="usage">
+      <div class="container">
+        <h3>How to Use</h3>
+        <p class="section-desc">Simple and intuitive. Here's how to get started.</p>
+        <div class="usage-steps">
+          <div class="usage-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Open Klipi</h4>
+              <p>Press <span class="keyboard-shortcut">Alt</span> + <span class="keyboard-shortcut">Cmd</span> + <span class="keyboard-shortcut">.</span> or click the menu bar icon.</p>
+            </div>
+          </div>
+          <div class="usage-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Grant Permissions</h4>
+              <p>Allow Input Monitoring access when prompted for global keyboard shortcuts.</p>
+            </div>
+          </div>
+          <div class="usage-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Browse History</h4>
+              <p>Use <span class="keyboard-shortcut">↑</span> <span class="keyboard-shortcut">↓</span> arrow keys to navigate your clipboard history.</p>
+            </div>
+          </div>
+          <div class="usage-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Copy an Item</h4>
+              <p>Press <span class="keyboard-shortcut">Enter</span> or click an item to copy it to your clipboard.</p>
+            </div>
+          </div>
+          <div class="usage-step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h4>Search (Optional)</h4>
+              <p>Start typing to filter clipboard items by content.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="support">
+      <div class="container">
+        <h3>Support Development</h3>
+        <p class="section-desc">If you find Klipi useful, consider supporting its development.</p>
+        <div class="donation-links">
+          <a href="https://github.com/sponsors/prolifel" class="btn btn-secondary" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub Sponsors
+          </a>
+          <a href="https://saweria.co/hahahihi" class="btn btn-secondary" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            Saweria
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="https://github.com/prolifel/klipi" target="_blank">GitHub</a>
+        <a href="https://github.com/prolifel/klipi/issues" target="_blank">Report Issue</a>
+        <a href="https://github.com/sponsors/prolifel" target="_blank">Sponsor</a>
+      </div>
+      <p>Released under the <a href="https://opensource.org/licenses/MIT" target="_blank">MIT License</a>. Made with ❤️ by <a href="https://github.com/prolifel" target="_blank">prolifel</a>.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Theme management
+    const themeToggle = document.getElementById('themeToggle');
+    const sunIcon = themeToggle.querySelector('.sun-icon');
+    const moonIcon = themeToggle.querySelector('.moon-icon');
+    const themeLabel = themeToggle.querySelector('.theme-label');
+
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      updateToggleUI(theme === 'dark' ? 'dark' : 'light');
+      localStorage.setItem('theme', theme);
+    }
+
+    function updateToggleUI(theme) {
+      if (theme === 'dark') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+        themeLabel.textContent = 'Dark';
+      } else {
+        sunIcon.style.display = 'block';
+        moonIcon.style.display = 'none';
+        themeLabel.textContent = 'Light';
+      }
+    }
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else {
+      updateToggleUI(getSystemTheme());
+    }
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        updateToggleUI(e.matches ? 'dark' : 'light');
+      }
+    });
+
+    // Toggle theme on click
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const systemTheme = getSystemTheme();
+      const effectiveTheme = currentTheme || systemTheme;
+      const newTheme = effectiveTheme === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    });
+
+    // Copy button functionality
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const code = btn.getAttribute('data-code');
+        try {
+          await navigator.clipboard.writeText(code);
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy:', err);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
