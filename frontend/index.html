@@ -23,7 +23,7 @@
   <meta property="og:url" content="https://klipi.prolifel.com/">
   <meta property="og:title" content="Klipi - Free macOS Clipboard History Manager">
   <meta property="og:description" content="Free clipboard history manager for macOS. Access your clipboard history instantly with Alt+Cmd+. keyboard shortcut. Lightweight, fast, open source.">
-  <meta property="og:image" content="https://klipi.prolifel.com/icon-light.png">
+  <meta property="og:image" content="https://klipi.prolifel.com/icon-light-256.png">
   <meta property="og:site_name" content="Klipi">
   <meta property="og:locale" content="en_US">
 
@@ -32,7 +32,7 @@
   <meta property="twitter:url" content="https://klipi.prolifel.com/">
   <meta property="twitter:title" content="Klipi - Free macOS Clipboard History Manager">
   <meta property="twitter:description" content="Free clipboard history manager for macOS. Access your clipboard history instantly with Alt+Cmd+. keyboard shortcut.">
-  <meta property="twitter:image" content="https://klipi.prolifel.com/icon-light.png">
+  <meta property="twitter:image" content="https://klipi.prolifel.com/icon-light-256.png">
   <meta property="twitter:creator" content="@prolifel">
 
   <!-- Structured Data (JSON-LD) -->
@@ -57,7 +57,7 @@
     "downloadUrl": "https://github.com/prolifel/klipi/releases",
     "softwareVersion": "1.0.5",
     "license": "https://opensource.org/licenses/MIT",
-    "screenshot": "https://klipi.prolifel.com/icon-light.png",
+    "screenshot": "https://klipi.prolifel.com/icon-light-256.png",
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "5",
@@ -462,11 +462,12 @@
 
     footer a {
       color: var(--accent);
-      text-decoration: none;
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
 
     footer a:hover {
-      text-decoration: underline;
+      text-decoration-thickness: 2px;
     }
 
     .footer-links {
@@ -507,8 +508,8 @@
       <div class="header-content">
         <a href="#" class="logo" aria-label="Klipi Home">
           <div class="logo-icon">
-            <img src="icon-light.png" alt="" class="icon-light img" width="32" height="32">
-            <img src="icon-dark.png" alt="" class="icon-dark img" width="32" height="32">
+            <img src="icon-light-128.png" alt="" class="icon-light img" width="32" height="32">
+            <img src="icon-dark-128.png" alt="" class="icon-dark img" width="32" height="32">
           </div>
           <span>Klipi</span>
         </a>
@@ -537,8 +538,8 @@
     <section class="hero">
       <div class="container">
         <div class="hero-icon">
-          <img src="icon-light.png" alt="Klipi - Clipboard History Manager" class="icon-light img" width="128" height="128">
-          <img src="icon-dark.png" alt="Klipi - Clipboard History Manager" class="icon-dark img" width="128" height="128">
+          <img src="icon-light-128.png" srcset="icon-light-128.png 1x, icon-light-256.png 2x" alt="Klipi - Clipboard History Manager" class="icon-light img" width="128" height="128">
+          <img src="icon-dark-128.png" srcset="icon-dark-128.png 1x, icon-dark-256.png 2x" alt="Klipi - Clipboard History Manager" class="icon-dark img" width="128" height="128">
         </div>
         <h1>Clipboard History,<br>Made Simple</h1>
         <p>A lightweight macOS clipboard history manager that lives in your menu bar. Fast, minimal, and stays out of your way.</p>
