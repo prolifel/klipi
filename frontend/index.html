@@ -3,10 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Klipi - A lightweight macOS clipboard history manager that lives in your menu bar">
+  <title>Klipi - Free macOS Clipboard History Manager</title>
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Klipi - Free macOS Clipboard History Manager">
+  <meta name="description" content="Klipi is a free, lightweight clipboard history manager for macOS. Access up to 50 clipboard items instantly with Alt+Cmd+. keyboard shortcut. Open source.">
+  <meta name="keywords" content="clipboard manager, macos clipboard, clipboard history, mac app, menu bar app, productivity, free clipboard, open source, mac utility, copy paste">
+  <meta name="author" content="prolifel">
+  <meta name="robots" content="index, follow">
+  <meta name="googlebot" content="index, follow">
+  <link rel="canonical" href="https://klipi.prolifel.com/">
+
+  <!-- Theme Color -->
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#1c1c1e" media="(prefers-color-scheme: dark)">
-  <title>Klipi - Lightweight macOS Clipboard History Manager</title>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://klipi.prolifel.com/">
+  <meta property="og:title" content="Klipi - Free macOS Clipboard History Manager">
+  <meta property="og:description" content="Free clipboard history manager for macOS. Access your clipboard history instantly with Alt+Cmd+. keyboard shortcut. Lightweight, fast, open source.">
+  <meta property="og:image" content="https://klipi.prolifel.com/icon-light.png">
+  <meta property="og:site_name" content="Klipi">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://klipi.prolifel.com/">
+  <meta property="twitter:title" content="Klipi - Free macOS Clipboard History Manager">
+  <meta property="twitter:description" content="Free clipboard history manager for macOS. Access your clipboard history instantly with Alt+Cmd+. keyboard shortcut.">
+  <meta property="twitter:image" content="https://klipi.prolifel.com/icon-light.png">
+  <meta property="twitter:creator" content="@prolifel">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Klipi",
+    "description": "Lightweight macOS clipboard history manager that lives in your menu bar. Access up to 50 clipboard items instantly with keyboard shortcuts.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "macOS 13+",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "prolifel",
+      "url": "https://github.com/prolifel"
+    },
+    "downloadUrl": "https://github.com/prolifel/klipi/releases",
+    "softwareVersion": "1.0.5",
+    "license": "https://opensource.org/licenses/MIT",
+    "screenshot": "https://klipi.prolifel.com/icon-light.png",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "5",
+      "ratingCount": "1"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Klipi",
+    "url": "https://klipi.prolifel.com/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://klipi.prolifel.com/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
   <style>
     :root {
       --bg: #ffffff;
@@ -121,7 +192,7 @@
       height: 32px;
     }
 
-    .logo h1 {
+    .logo span {
       font-size: 1.25rem;
       font-weight: 600;
     }
@@ -171,7 +242,7 @@
       height: 128px;
     }
 
-    .hero h2 {
+    .hero h1 {
       font-size: 3rem;
       font-weight: 700;
       margin-bottom: 16px;
@@ -228,7 +299,7 @@
       padding: 60px 0;
     }
 
-    section h3 {
+    section h2 {
       font-size: 2rem;
       margin-bottom: 16px;
       text-align: center;
@@ -407,7 +478,7 @@
 
     /* Responsive */
     @media (max-width: 640px) {
-      .hero h2 {
+      .hero h1 {
         font-size: 2rem;
       }
 
@@ -415,7 +486,7 @@
         font-size: 1rem;
       }
 
-      section h3 {
+      section h2 {
         font-size: 1.5rem;
       }
 
@@ -434,12 +505,12 @@
   <header>
     <div class="container">
       <div class="header-content">
-        <a href="#" class="logo">
+        <a href="#" class="logo" aria-label="Klipi Home">
           <div class="logo-icon">
-            <img src="icon-light.png" alt="Klipi Logo" class="icon-light img">
-            <img src="icon-dark.png" alt="Klipi Logo" class="icon-dark img">
+            <img src="icon-light.png" alt="" class="icon-light img" width="32" height="32">
+            <img src="icon-dark.png" alt="" class="icon-dark img" width="32" height="32">
           </div>
-          <h1>Klipi</h1>
+          <span>Klipi</span>
         </a>
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
           <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -466,10 +537,10 @@
     <section class="hero">
       <div class="container">
         <div class="hero-icon">
-          <img src="icon-light.png" alt="Klipi" class="icon-light img">
-          <img src="icon-dark.png" alt="Klipi" class="icon-dark img">
+          <img src="icon-light.png" alt="Klipi - Clipboard History Manager" class="icon-light img" width="128" height="128">
+          <img src="icon-dark.png" alt="Klipi - Clipboard History Manager" class="icon-dark img" width="128" height="128">
         </div>
-        <h2>Clipboard History,<br>Made Simple</h2>
+        <h1>Clipboard History,<br>Made Simple</h1>
         <p>A lightweight macOS clipboard history manager that lives in your menu bar. Fast, minimal, and stays out of your way.</p>
         <div class="hero-buttons">
           <a href="#install" class="btn btn-primary">
@@ -484,9 +555,9 @@
       </div>
     </section>
 
-    <section id="features">
+    <section id="features" aria-labelledby="features-heading">
       <div class="container">
-        <h3>Features</h3>
+        <h2 id="features-heading">Features</h2>
         <p class="section-desc">Everything you need in a clipboard manager, nothing you don't.</p>
         <div class="features-grid">
           <div class="feature-card">
@@ -523,9 +594,9 @@
       </div>
     </section>
 
-    <section id="install">
+    <section id="install" aria-labelledby="install-heading">
       <div class="container">
-        <h3>Installation</h3>
+        <h2 id="install-heading">Installation</h2>
         <p class="section-desc">Get Klipi running in seconds with Homebrew.</p>
         <div class="install-section">
           <p>Install via Homebrew (recommended):</p>
@@ -537,9 +608,9 @@
       </div>
     </section>
 
-    <section id="usage">
+    <section id="usage" aria-labelledby="usage-heading">
       <div class="container">
-        <h3>How to Use</h3>
+        <h2 id="usage-heading">How to Use</h2>
         <p class="section-desc">Simple and intuitive. Here's how to get started.</p>
         <div class="usage-steps">
           <div class="usage-step">
@@ -581,9 +652,9 @@
       </div>
     </section>
 
-    <section id="support">
+    <section id="support" aria-labelledby="support-heading">
       <div class="container">
-        <h3>Support Development</h3>
+        <h2 id="support-heading">Support Development</h2>
         <p class="section-desc">If you find Klipi useful, consider supporting its development.</p>
         <div class="donation-links">
           <a href="https://github.com/sponsors/prolifel" class="btn btn-secondary" target="_blank">
