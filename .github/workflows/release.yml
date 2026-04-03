@@ -73,10 +73,15 @@ jobs:
         with:
           name: klipi-dmg
 
+      - name: List downloaded files
+        run: ls -la
+
       - name: Compute sha256
         id: sha
         run: |
-          SHA256="$(shasum -a 256 "Klipi-${{ steps.meta.outputs.version }}.dmg" | cut -d' ' -f1)"
+          DMG_FILE=$(find . -name "*.dmg" -type f | head -1)
+          echo "Found DMG: $DMG_FILE"
+          SHA256="$(shasum -a 256 "$DMG_FILE" | cut -d' ' -f1)"
           echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
 
       - name: Checkout tap (write-enabled)
