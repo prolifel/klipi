@@ -69,12 +69,9 @@ jobs:
           echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: Download DMG for checksum
-        uses: dsaltares/fetch-gh-release-asset@master
+        uses: actions/download-artifact@v4
         with:
-          version: tags/${{ github.ref_name }}
-          file: Klipi-${{ steps.meta.outputs.version }}.dmg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: klipi-dmg
 
       - name: Compute sha256
         id: sha
