@@ -16,8 +16,7 @@ a lightweight macos clipboard history manager.
 ### homebrew
 
 ```bash
-brew tap prolifel/homebrew-tap
-brew install klipi
+brew install --cask prolifel/homebrew-tap/klipi
 ```
 
 ## license
